@@ -19,6 +19,7 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "@tonaljs/tonal": "^4.6.0",
     "canvas-sketch-util": "^1.10.0",
     "nice-color-palettes": "^3.0.0"
   }

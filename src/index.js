@@ -6,7 +6,13 @@ const App = {
 	audio : new AudioContext(),
 	canvas : document.createElement('canvas'),
 	parent : document.body,
+	onClick: cb => this._onClick = cb
 }
+
+window.addEventListener('click', e => {
+	if(App._onClick) App._onClick(e)
+	if(App.audio.state === 'suspended') App.audio.resume();
+})
 
 function init({ dimensions }) {
 	App.context = App.canvas.getContext('2d'),
