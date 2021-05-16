@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ClosurePlugin = require('closure-webpack-plugin');
 
 module.exports = {
 	mode: 'development',
@@ -17,5 +18,19 @@ module.exports = {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
 		clean: true
-  }
+  },
+	optimization: {
+		minimizer: [
+			new ClosurePlugin({mode: 'STANDARD'}, {
+				// compiler flags here
+				//
+				// for debugging help, try these:
+				//
+				// formatting: 'PRETTY_PRINT'
+				// debug: true,
+				// renaming: false
+			})
+		]
+	}
 };
+

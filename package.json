@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
+    "build:prod": "webpack --mode production",
     "watch": "webpack --watch",
     "start": "webpack serve --open"
   },
@@ -13,6 +14,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "closure-webpack-plugin": "^2.5.0",
+    "google-closure-compiler": "^20210505.0.0",
     "html-webpack-plugin": "^5.3.1",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0",
@@ -21,6 +24,7 @@
   "dependencies": {
     "@tonaljs/tonal": "^4.6.0",
     "canvas-sketch-util": "^1.10.0",
-    "nice-color-palettes": "^3.0.0"
+    "nice-color-palettes": "^3.0.0",
+    "pts": "^0.10.5"
   }
 }
