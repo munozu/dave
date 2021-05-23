@@ -1,11 +1,10 @@
 const defaultSettings = { width: 1024, height: 1024 }
 
-export default function resize(bound, space, settings = defaultSettings) {
-	const { element } = space
+export default function resize({ ctx, canvas }, settings = defaultSettings) {
 	const dpr = devicePixelRatio
 
-	const maxWidth = bound.width 
-	const maxHeight = bound.height
+	const maxWidth = window.innerWidth
+	const maxHeight = window.innerHeight
 	
 	const canvasWidth = settings.width * dpr
 	const canvasHeight = settings.height * dpr
@@ -25,18 +24,17 @@ export default function resize(bound, space, settings = defaultSettings) {
 			styleHeight = styleWidth / aspect
 		}
 	}
-	const scale = Math.min(canvasWidth/styleWidth, canvasHeight/styleHeight)
 
+	const scale = Math.min(canvasWidth/styleWidth, canvasHeight/styleHeight)
 	const origin = {
 		x:(canvasWidth - styleWidth * scale)/2,
 		y:(canvasHeight - styleHeight *scale)/2
 	}
 
-	element.width = canvasWidth 
-	element.height = canvasHeight 
-	element.style.width = styleWidth
-	element.style.height = styleHeight
-	element.style.margin= '0 auto'
-	space.ctx.setTransform(scale, 0, 0, scale, origin.x, origin.y);
+	canvas.width = canvasWidth 
+	canvas.height = canvasHeight 
+	canvas.style.width = styleWidth
+	canvas.style.height = styleHeight
+	ctx.setTransform(scale, 0, 0, scale, origin.x, origin.y);
 	return [styleWidth, styleHeight]
 }

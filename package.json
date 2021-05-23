@@ -25,6 +25,6 @@
     "@tonaljs/tonal": "^4.6.0",
     "canvas-sketch-util": "^1.10.0",
     "nice-color-palettes": "^3.0.0",
-    "pts": "^0.10.5"
+    "victor": "^1.1.0"
   }
 }

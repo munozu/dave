@@ -1,34 +1,37 @@
-import { Bound, Sound, Num, CanvasSpace, Pt, Group, Geom} from "pts"
+import * as Dave from './sketch'
 import resize from './resize'
 
-const { ctx: audio } = new Sound()
-const space = new CanvasSpace('dave').setup({ bgcolor: "#bae", resize: true});
-const form = space.getForm()
-const settings = { width: 1000, height: 1000 }
-const margin = 100
+const config = {}
 
-const b = new Bound()
+function init() {
+	config.canvas = document.createElement('canvas');
+	config.ctx = config.canvas.getContext('2d');
+	config.audio = new AudioContext();
+	document.body.appendChild(config.canvas)
+	const [width, height] = resize(config)
+	config.width = width;
+	config.height = height;
+	const render = Dave.sketch(config);
+	requestAnimationFrame(t => loop(t, render))
+}
 
-space
-	.add({
-		start: (bound, space) => { 
-		},
-		animate: (time, frameTime, cs) => { 
-			const [w, h] = b.size
-			form.point(space.pointer, w/100, 'circle')
-		},
-		action: (type, x, y, event) => { 
-			// code for interaction 
-			if (type === "up") { // for safari
-				if (audio.state === 'suspended') {
-					audio.resume();
-				}
-			}
-			
-		},
-		resize: (bound, event) => {
-			b.size = resize(bound, space, settings)
-		}
-	})
+let lastRender = 0
+function loop(t, r) {
+	const delta = t - lastRender
+	r(t, delta, [config.width, config.height]);
+	lastRender = t
+	if(Dave.settings.animate) {
+		requestAnimationFrame(t => loop(t, r))
+	}
+}
+window.addEventListener('mouseup', _ => {
+	if(config.audio.state ==='suspended') config.audio.resume()
+})
 
-space.bindMouse().bindTouch().play();
+window.addEventListener('resize', _ => {
+	const [ width, height ] = resize(config)
+	config.width = width
+	config.height = height
+})
+
+window.addEventListener('load', init)
