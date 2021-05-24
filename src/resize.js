@@ -1,16 +1,17 @@
-const defaultSettings = { width: 1024, height: 1024 }
+const defaultSettings = [1024, 1024] 
 
-export default function resize({ ctx, canvas }, settings = defaultSettings) {
+export default function resize({ ctx, canvas }, dimensions = defaultSettings) {
+	const [width, height] = dimensions;
 	const dpr = devicePixelRatio
 
 	const maxWidth = window.innerWidth
 	const maxHeight = window.innerHeight
 	
-	const canvasWidth = settings.width * dpr
-	const canvasHeight = settings.height * dpr
+	const canvasWidth = width * dpr
+	const canvasHeight = height * dpr
 
-	let styleWidth = settings.width
-	let styleHeight = settings.height
+	let styleWidth = width
+	let styleHeight = height
 
 	const aspect = canvasWidth / canvasHeight;
 	const windowAspect = maxWidth / maxHeight;

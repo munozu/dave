@@ -1,17 +1,14 @@
 import * as Dave from './sketch'
 import resize from './resize'
 
-const config = {
-	audio: new AudioContext(),
-}
-
+const config = {}
 let rafId = null
 
 function init() {
 	config.canvas = document.createElement('canvas');
 	config.ctx = config.canvas.getContext('2d');
 	document.body.appendChild(config.canvas)
-	const [width, height] = resize(config)
+	const [width, height] = resize(config, Dave.settings.dimensions)
 	config.width = width;
 	config.height = height;
 	const render = Dave.sketch(config);
@@ -23,7 +20,7 @@ function loop(t, r) {
 	const delta = t - lastRender
 	r(t, delta, [config.width, config.height]);
 	lastRender = t
-	if(Dave.settings && Dave.settings.animate) {
+	if(Dave.settings.animate) {
 		rafId = requestAnimationFrame(t => loop(t, r))
 	}
 }
@@ -35,10 +32,6 @@ function dispose() {
 	config.canvas = null
 	rafId = null
 }
-
-window.addEventListener('mouseup', _ => {
-	if(config.audio.state ==='suspended') config.audio.resume()
-})
 
 window.addEventListener('resize', _ => {
 	dispose()
