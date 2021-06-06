@@ -1,98 +1,45 @@
-import { mapRange } from 'canvas-sketch-util/math'
-const audio = new AudioContext();
-const state = { interacted: 0, mouseisdown: false };
+import rnd from 'canvas-sketch-util/random'
+import * as Tone from 'tone'
+import {ToneConstantSource} from 'tone/build/esm/signal/ToneConstantSource'
 
+export function sketch({ ctx, width, height }) {
+	const source = new ToneConstantSource().start()
+	const meter = new Tone.Meter(0.1)
+	source.connect(meter)
+	meter.set({normalRange: true})
+	const synth = new Tone.PolySynth(Tone.MonoSynth)
+	synth.set({ envelope: { attack: 0.001, decay: 1, sustain: 0.2, release: 1 } })
+	const filter =  new Tone.Filter(220, 'lowpass').toDestination()
+	filter.set({ Q: 1 })
+	synth.connect(filter)
 
-export function sketch({ ctx, canvas, width, height }) {
-	const voice = new Voice()
-	const analyser =  audio.createAnalyser()
+	const seq = new Tone.Loop((time) => {
+		const note = Tone.Frequency(meter.getValue()+1).toNote()
+		synth.triggerAttackRelease(note, 0.2, time, Math.random())
+	}, '16n')
 
-	voice.connect(analyser)
-	analyser.connect(audio.destination)
+	// seq.start();
+	// Tone.Transport.start()
 
-	analyser.fftSize = 1024
-	let buflen = analyser.frequencyBinCount;
-	let dataArray =  new Float32Array(buflen);
-	canvas.onmousedown = onMouseDown
-	canvas.onmouseup = onMouseUp
-	let to;
-	return _ => {
+	return (t, ft) => {
 		ctx.fillStyle = '#333'
-		ctx.fillRect(0,0,width, height);
-		if(state.mouseisdown) {
-			if(to) clearTimeout(to)
-			to = setTimeout(() => {
-				let value =  mapRange(state.pos.y/height, 0, 1, 440, 40 )
-				voice.play(value, 0.1, 3)
-				console.log(dataArray)
-			}, 20)
-		}
-		analyser.getFloatTimeDomainData(dataArray)
-		let sliceWidth =  width/buflen
-		let x = 0
+		ctx.fillRect(0, 0, width, height)
+
 		ctx.fillStyle = 'white'
-		for(let i = 0; i < buflen; i++){
-			let v = dataArray[i]
-			let y = v * height + height/2
-			ctx.fillRect(x, y, 2, 2)
-			x += sliceWidth;
-		}
-	}
-}
+		const value = rnd.noise1D(t%4000/4000, 4, 1)
+		source.offset.setValueAtTime(value*height, Tone.now())
+		ctx.fillRect(0, meter.getValue(), width, 2)
 
-function onMouseDown(e) {
-	state.pos = { x: e.x , y: e.y }
-	state.mouseisdown = true
-}
+		ctx.fillStyle = '#fff3'
+		ctx.fillRect(0, height/2, width, 2)
 
-function onMouseUp(e) {
-	state.pos = { x: e.x , y: e.y }
-	state.mouseisdown = false
-}
-
-window.addEventListener('click', _ => {
-	if(audio.state === 'suspended') audio.resume()
-})
-
-class Voice {
-	constructor() {
-		this.osc = audio.createOscillator()
-		this.amp = audio.createGain()
-		this.env = audio.createGain()
-		this.flt =  audio.createBiquadFilter()
-
-		this.osc.type =  'square';
-		this.osc.frequency.value = 220;
-		this.amp.gain.value =  0.1;
-		this.env.gain.value = 0.0;
-
-		this.osc.start()
-		this.osc.connect(this.amp)
-		this.amp.connect(this.env)
-		this.env.connect(this.flt)
-	}
-
-	connect(n) {
-		this.flt.connect(n)
-	}
-
-	play(value, attack, decay) {
-		this.osc.frequency.linearRampToValueAtTime(value, audio.currentTime)
-		this.env.gain.cancelScheduledValues(audio.currentTime)
-		this.env.gain.linearRampToValueAtTime(0.0, audio.currentTime + 0.0003)
-		this.env.gain.linearRampToValueAtTime(1, audio.currentTime + attack)
-		this.env.gain.linearRampToValueAtTime(0, audio.currentTime + attack + decay)
-	}
-}
-
-function* iter(len) {
-	let count = 0
-	while(count < len) {
-		yield count++
+		ctx.fillStyle = 'white'
+		ctx.fillText(meter.getValue(), width/2, height-40)
 	}
 }
 
 export const settings = {
-	dimensions: [1024, 1024],
+	dimensions: [2048, 2048],
 	animate: true
 }
+

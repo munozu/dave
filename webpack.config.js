@@ -1,36 +1,53 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ClosurePlugin = require('closure-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
 	mode: 'development',
   entry: './src/index.js',
 	devServer: {
-		contentBase: './dist',
+		contentBase: path.join(__dirname, 'dist'),
+		hot: true,
 	},
 	plugins: [
+		new webpack.ProgressPlugin(),
 		new HtmlWebpackPlugin({
-			title: 'Development',
+			title: 'Dave',
 			template:'src/index.html'
 		})
 	],
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
+		publicPath: '/',
 		clean: true
   },
-	optimization: {
-		minimizer: [
-			new ClosurePlugin({mode: 'STANDARD'}, {
-				// compiler flags here
-				//
-				// for debugging help, try these:
-				//
-				// formatting: 'PRETTY_PRINT'
-				// debug: true,
-				// renaming: false
-			})
+	resolve: {
+		alias: {
+			'audio-worklet': path.resolve(__dirname, 'src/util/audio-worklet.js')
+		}
+	},
+	module: {
+		parser: {
+			javascript: {
+				worker: ['AudioWorklet from audio-worklet', '...']
+			}
+		},
+		rules: [
+			{
+				test: /\.m?js$/,
+				exclude: /(node_modules|bower_components)/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: ['@babel/preset-env']
+					}
+				}
+			}
 		]
+	},
+	experiments: {
+		topLevelAwait: true
 	}
 };
 

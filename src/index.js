@@ -1,5 +1,5 @@
 import * as Dave from './sketch'
-import resize from './resize'
+import resize from './util/resize'
 
 const config = {}
 let rafId = null
